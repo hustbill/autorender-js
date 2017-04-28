@@ -1,0 +1,58 @@
+$fa-font-path: "~font-awesome/fonts";
+/* weave company colours */
+$weave-gray-blue: rgb(85,105,145);
+$weave-blue: rgb(0,210,255);
+$weave-orange: rgb(255,75,25);
+$weave-charcoal-blue: rgb(50,50,75); // #32324B
+$huawei-bg-color: rgb(23, 23, 25);
+
+$base-font: "Roboto", sans-serif;
+$mono-font: "Menlo", "DejaVu Sans Mono", "Liberation Mono", monospace;
+
+$base-ease: ease-in-out;
+$primary-color: rgb(255, 255, 255);
+
+$background-color: darken($primary-color, 66%);
+$background-lighter-color: darken($background-color, 8%);
+$background-average-color: mix($background-color, $background-lighter-color);
+$background-darker-color: lighten($background-color, 8%);
+$background-darker-secondary-color: lighten($background-color, 4%);
+$background-dark-color: $primary-color;  /* rgb(255, 51, 0) */
+$text-color: darken($primary-color, 5%);
+$text-secondary-color: darken($text-color, 15%);
+$text-tertiary-color: darken($text-color, 30%);
+$border-light-color: darken ($text-color, 60%);
+$text-darker-color:  $primary-color;
+$white: $background-lighter-color;
+
+$details-window-width: 420px;
+$details-window-padding-left: 36px;
+$border-radius: 4px;
+
+$terminal-header-height: 44px;
+
+$node-highlight-shadow-opacity: 0.5;
+$node-highlight-stroke-opacity: 0.4;
+$node-highlight-stroke-width: 0.04;
+$node-border-stroke-width: 0.12;
+$node-shadow-stroke-width: 0.18;
+$node-pseudo-opacity: 0.8;
+$node-text-scale: 2;
+$edge-highlight-opacity: 0.1;
+$edge-opacity-blurred: 0.2;
+$edge-opacity: 0.5;
+/* $edge-color: rgb(110, 110, 156); */
+$edge-color: rgb(255, 255, 255);
+$btn-opacity-default: 0.7;
+$btn-opacity-hover: 1;
+$btn-opacity-selected: 0.9;
+$btn-opacity-disabled: 0.25;
+
+$link-opacity-default: 0.8;
+
+$search-border-color: transparent;
+$search-border-width: 1px;
+
+/* specific elements */
+$body-background-color: linear-gradient(30deg, $background-color 0%, $background-lighter-color 100%);
+$label-background-color: fade-out($background-average-color, .3);

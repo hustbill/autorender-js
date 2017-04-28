@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: autorender-ui
+spec:
+  type: NodePort
+  ports:
+  - port: 80
+    targetPort: 4042
+    nodePort: 30040
+    protocol: TCP
+    name: autorender-ui
+  selector:
+    name: autorender-ui-pod
+---
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: autorender-ui
+spec:
+  replicas: 1
+  selector:
+    name: autorender-ui-pod
+  template:
+    metadata:
+      name: autorender-ui-pod
+      labels:
+        name: autorender-ui-pod
+    spec:
+      restartPolicy: Always
+      containers:
+      - name: autorender-ui
+        image: billyzhang2010/autorender-ui:latest
+        ports:
+        - containerPort: 80
+        - containerPort: 4042
+        imagePullPolicy: "Always"
