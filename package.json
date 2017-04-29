@@ -31,6 +31,7 @@
     "react": "15.4.2",
     "react-addons-perf": "15.4.2",
     "react-dom": "15.4.2",
+    "react-linechart": "^1.1.9",
     "react-motion": "0.4.5",
     "react-redux": "4.4.6",
     "react-tooltip": "3.2.2",

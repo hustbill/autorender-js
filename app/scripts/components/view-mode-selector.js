@@ -49,7 +49,6 @@ class ViewModeSelector extends React.Component {
             hasResourceView)}
           {Item('fa fa-external-link', 'Control', isControlViewMode, this.props.setControlView)}
           {Item('fa fa-table', 'Table', isTableViewMode, this.props.setTableView)}
-
         </div>
         <MetricSelector />
       </div>

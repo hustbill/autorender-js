@@ -3,15 +3,24 @@ import { connect } from 'react-redux';
 import LineChart from 'react-linechart';
 import '../../styles/styles.css';
 
-import Logo from './logo';
-// import ZoomWrapper from './zoom-wrapper';
 import {
   toggleTroubleshootingMenu,
   resetLocalViewState,
   clickDownloadGraph
 } from '../actions/app-actions';
 
-class NodesResources extends React.Component {
+class ReportChart extends React.Component {
+  constructor(props, context) {
+    super(props, context);
+
+    this.handleClickReset = this.handleClickReset.bind(this);
+  }
+
+  handleClickReset(ev) {
+    ev.preventDefault();
+    this.props.resetLocalViewState();
+  }
+
   render() {
     const data = [
       {
@@ -20,30 +29,16 @@ class NodesResources extends React.Component {
                   {x: 11, y: 0}, {x: 12, y: -1}]
       }
     ];
-
-    const data2 = [
-      {
-        color: 'green',
-        points: [{x: 2, y: 2}, {x: 4, y: 5}, {x: 9, y: -3}, {x: 11, y: -4},
-                  {x: 13, y: 0}, {x: 15, y: -1}]
-      }
-    ];
-
     return (
-      <div className="nodes-resources" style={{display: 'flex', justifyContent: 'center'}}>
-        <Logo transform="translate(24,24) scale(0.25)" />
-        <h2>
+      <div>
+        <div className="App">
+          <h1>Demo Chart</h1>
           <LineChart
-            width={640}
-            height={480}
+            width={600}
+            height={400}
             data={data}
           />
-          <LineChart
-            width={640}
-            height={480}
-            data={data2}
-          />
-        </h2>
+        </div>
       </div>
     );
   }
@@ -53,4 +48,4 @@ export default connect(null, {
   toggleTroubleshootingMenu,
   resetLocalViewState,
   clickDownloadGraph
-})(NodesResources);
+})(ReportChart);
