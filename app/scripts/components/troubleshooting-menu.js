@@ -7,10 +7,12 @@ import {
   clickDownloadGraph
 } from '../actions/app-actions';
 
+// -d 'dpdk|192.168.122.224:50051|
+//  10.0.5.4/0,10.0.207.0/8,0/0,0/0,0/0;sum,volume,1000;32,32,8,16,16;100'
 class DebugMenu extends React.Component {
   constructor(props, context) {
     super(props, context);
-    this.state = { value: 'Initial data...'};
+    this.state = { data: 'dpdk|192.168.122.224:50051|10.0.5.4/0,10.0.207.0/8,0/0,0/0,0/0;sum,volume,1000;32,32,8,16,16;100', monitor: 'http://10.104.211.137/'};
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
@@ -19,7 +21,7 @@ class DebugMenu extends React.Component {
     // ev.preventDefault();
     // this.props.resetLocalViewState();
     this.setState({
-      value: 'dpdk'
+      data: 'dpdk'
     });
   }
 
@@ -27,12 +29,26 @@ class DebugMenu extends React.Component {
     alert(this.state.value);
   }
 
-  handleChange(ev) {
-    this.setState({value: ev.target.value});
+  handleChange(e) {
+    this.setState({[e.target.name]: e.target.value});
   }
 
+
   handleSubmit(ev) {
-    alert(this.state.value);
+    const result = `${this.state.data} : ${this.state.monitor}`;
+    // alert(str);
+    console.log(result);
+    const blob = new Blob(this.state.data, {type: 'text/plain'});
+    fetch(this.state.monitor, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: blob
+    });
+
+    console.log(this.state.data);
     ev.preventDefault();
   }
 
@@ -43,14 +59,27 @@ class DebugMenu extends React.Component {
           <h3>Network Control & Monitor</h3>
           <h4>{new Date().toLocaleTimeString()}</h4>
           <h4>{this.props.name}</h4>
-          <div className="troubleshooting-menu-item" style={{height: 360, width: 480}}>
-            <h4>Post Request</h4>
+          <div className="troubleshooting-menu-item" style={{height: 480, width: 640}}>
+            <h4>Post Request to Monitor Server:</h4>
             <form onSubmit={this.handleSubmit}>
-              <label htmlFor="flavor">
-                Pick your favorite La Croix flavor:
+              <label htmlFor="post-request">
+                Parameter:
               </label>
               <br />
-              <input type="text" value={this.state.value} onChange={this.handleChange} />
+              <textarea
+                style={{width: 540, height: 240, borderColor: 'gray', borderWidth: 2}}
+                value={this.state.data} name="data" onChange={this.handleChange} />
+              <br />
+              <br />
+              <label htmlFor="monitor-server">
+                Monitor Server:
+              </label>
+              <br />
+              <input
+                type="text"
+                style={{width: 540, borderColor: 'gray', borderWidth: 2}}
+                value={this.state.monitor} name="monitor" onChange={this.handleChange} />
+              <br />
               <br />
               <input type="submit" value="Submit" />
             </form>

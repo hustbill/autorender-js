@@ -63,6 +63,7 @@ class NodesChartEdges extends React.Component {
             key={edge.get('id')}
             id={edge.get('id')}
             source={edge.get('source')}
+            label={'label'}
             target={edge.get('target')}
             waypoints={edge.get('points')}
             highlighted={edge.get('highlighted')}
