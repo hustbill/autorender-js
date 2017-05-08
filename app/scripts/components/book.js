@@ -23,7 +23,7 @@ var result = {};
           statement_id: 0,
           series: [
             {
-              name: 'cpu_usage',
+              name: 'cpuUsage',
               columns: [
                 'time',
                 'appname',
@@ -70,17 +70,32 @@ var result = {};
 
 // Using the reviver parameter
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse
-var cpu_usage = [];
-var secondObj = JSON.parse(JSON.stringify(dbresult), (key, value) => {
-  if (key === 'values') {
-    cpu_usage.push(value);
-  }
-  // console.log(key); // log the current property name, the last is "".
-  //console.log(value);
-  return value;     // return the unchanged property value.
-});
+var cpuUsage = [];
+function transform(dbresult) {
+  var secondObj = JSON.parse(JSON.stringify(dbresult), (key, value) => {
+    if (key === 'values') {
+      cpuUsage.push(value);
+    }
+    // console.log(key); // log the current property name, the last is "".
+    return value;     // return the unchanged property value.
+  });
+  return cpuUsage;
+}
 
-console.log(cpu_usage);
+function convert(cpuUsage) {
+  var transformData = [];
+  for (var i  = 0; i < cpuUsage[0].length; i++){
+    var row = {text: cpuUsage[0][i][0],  value: cpuUsage[0][i][2]};
+    // { text: '2017-05-05T01:51:03.514798957Z', value: 3 }
+    transformData.push(row);
+  }
+  return transformData;
+}
+
+cpuUsage = transform(dbresult);
+var barData = convert(cpuUsage);
+// console.log(cpuUsage);
+console.log(barData);
 //var getTweetData = function() {
 //	var str = JSON.stringify(dbresult);
 //	var parsedJSON = JSON.parse(str);
@@ -94,3 +109,8 @@ console.log(cpu_usage);
 //var numTweets = 1;
 //var ts = {tweets:getTweetData()}
 //console.log({tweets:getTweetData()})
+
+const str = '2017-05-05T01:51:03.514798957Z';
+
+var hms = str.substring('2017-05-05T'.length, '2017-05-05T'.length + '01:51:03'.length);
+console.log(hms);

@@ -53,7 +53,7 @@ class NodesResources extends React.Component {
 
   componentDidMount() {
     const host = 'http://localhost:8086/query?pretty=true&p=root&u=root&db=workload&rpovh=&';
-    const q = 'q=SELECT appname, value from cpu_usage limit 5';
+    const q = 'q=SELECT appname, value from cpu_usage limit 8';
     const cmd = host.concat(q);
     // fetch('http://localhost:8086/ping')
     fetch(cmd)
@@ -74,13 +74,13 @@ class NodesResources extends React.Component {
     this.props.enterEdge(ev.currentTarget.id);
   }
 
+
   querydb(ev) {
-    const result = `${this.state.appname} : ${this.state.value}`;
-    console.log(result);
+    // const result = `${this.state.appname} : ${this.state.value}`;
     influx.query(`
        select * from concurrentuser
        order by time desc
-       limit 3
+       limit 5
      `).then((rows) => {
        this.setState({state: rows.value});
        console.log(rows);
@@ -97,88 +97,54 @@ class NodesResources extends React.Component {
                   {x: 11, y: 2}, {x: 12, y: 1}]
       }
     ];
-
+    /*
     const bardata = [
       {text: 'core1', value: 340},
-      {text: 'core2', value: 280},
-      {text: 'core3', value: 200},
-      {text: 'core4', value: 360},
-      {text: 'core5', value: 400},
-      {text: 'core6', value: 420},
-      {text: 'core7', value: 300},
-      {text: 'core8', value: 450}
+      {text: 'core2', value: 280}
+    ]; */
+
+    const data2 = [
+      {
+        color: 'green',
+        points: [{x: 2, y: 3}, {x: 4, y: 7}, {x: 9, y: 3}, {x: 11, y: 2},
+                  {x: 13, y: 2}, {x: 15, y: 3}]
+      }
     ];
 
-    const dbresult = {
-      results: [
-        {
-          statement_id: 0,
-          series: [
-            {
-              name: 'cpu_usage',
-              columns: [
-                'time',
-                'appname',
-                'value'
-              ],
-              values: [
-                [
-                  '2017-05-05T01:51:01.23080652Z',
-                  'mysql',
-                  32
-                ],
-                [
-                  '2017-05-05T01:51:01.29018857Z',
-                  'mysql',
-                  32
-                ],
-                [
-                  '2017-05-05T01:51:03.41623435Z',
-                  'mysql',
-                  3
-                ],
-                [
-                  '2017-05-05T01:51:03.514798957Z',
-                  'mysql',
-                  3
-                ],
-                [
-                  '2017-05-05T01:51:06.511885971Z',
-                  'mysql',
-                  1
-                ]
-              ]
-            }
-          ]
-        }
-      ]};
-
-      const data2 = [
-        {
-          color: 'green',
-          points: [{x: 2, y: 3}, {x: 4, y: 7}, {x: 9, y: 3}, {x: 11, y: 2},
-                    {x: 13, y: 2}, {x: 15, y: 3}]
-        }
-      ];
-
-        const secondObj = JSON.parse(JSON.stringify(dbresult), (key, value) => {
-            if (key === 'values') {
-              console.log(value);
-              cpuUsage.push(value);
-            }
-
-            // console.log(key);
-            // log the current property name, the last is "".
-            // console.log(value);
-            return value;     // return the unchanged property value.
-          });
-
-
     const margin = {top: 20, right: 20, bottom: 30, left: 40};
-    const cpuUsage = [];
+
+    // Using the reviver parameter
+    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse
+    function transform(result) {
+      const parseData = [];
+      JSON.parse(JSON.stringify(result), (key, value) => {
+        if (key === 'values') {
+          parseData.push(value);
+        }
+        // console.log(key); // log the current property name, the last is "".
+        return value;     // return the unchanged property value.
+      });
+      return parseData;
+    }
 
 
+    function convert(cpuData) {
+      const convertResult = [];
+      let hhmmss;
+      if (cpuData !== null && cpuData.length !== 0) {
+        let row = {};
+        let i = 0;
+        for (; i < cpuData[0].length; i += 1) {
+          hhmmss = cpuData[0][i][0].substring('2017-05-05T'.length, '2017-05-05T'.length + '01:51:03'.length);
+          row = {text: hhmmss, value: cpuData[0][i][2]};
+          // { text: '2017-05-05T01:51:03.514798957Z', value: 3 }
+          convertResult.push(row);
+        }
+        console.log(convertResult);
+      }
 
+      return convertResult;
+    }
     return (
       <div className="nodes-resources" style={{ display: 'flex', justifyContent: 'center', position: 'relative', top: 200, left: 1 }}>
         <Logo transform="translate(24,24) scale(0.25)" />
@@ -196,31 +162,27 @@ class NodesResources extends React.Component {
           />
         </div>
         <div style={{width: '20%', height: '%15', display: 'flex', justifyContent: 'center', position: 'relative', top: 80, left: 280}}>
+          <label htmlFor="cpu-usage">
+            CPU Usage
+          </label>
           <BarChart
             title={'Usage per Core'}
-            data={bardata}
-            width={480}
-            height={320}
+            data={convert(transform(this.state.items))}
+            width={400}
+            height={240}
             margin={margin}
             onClick={this.handleMouseEnter}
            />
         </div>
         <div>
           <textarea
-            style={{width: 400, height: 20, borderColor: 'gray', borderWidth: 2}}
-            value={JSON.stringify(dbresult)} name="monitor" onChange={this.handleChange} />
-          <br />
-          <br />
-          <textarea
-            style={{width: 480, height: 20, borderColor: 'gray', borderWidth: 2}}
-            value={cpuUsage[0][1]} name="monitor1" onChange={this.handleChange} />
+            style={{width: 360, height: 20, borderColor: 'gray', borderWidth: 2}}
+            value={JSON.stringify(this.state.items)} name="monitor" onChange={this.handleChange} />
           <br />
           <textarea
-            style={{width: 480, height: 50, borderColor: 'gray', borderWidth: 2}}
-            value={secondObj} name="monitor2" onChange={this.handleChange} />
+            style={{width: 360, height: 20, borderColor: 'gray', borderWidth: 2}}
+            value={convert(transform(this.state.items))[0].text} name="monitor1" onChange={this.handleChange} />
           <br />
-          <br />
-
         </div>
       </div>
     );
