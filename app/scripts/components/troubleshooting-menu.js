@@ -59,7 +59,7 @@ class DebugMenu extends React.Component {
           <h3>Network Control & Monitor</h3>
           <h4>{new Date().toLocaleTimeString()}</h4>
           <h4>{this.props.name}</h4>
-          <div className="troubleshooting-menu-item" style={{height: 480, width: 640}}>
+          <div className="troubleshooting-menu-item" style={{height: 400, width: 600}}>
             <h4>Post Request to Monitor Server:</h4>
             <form onSubmit={this.handleSubmit}>
               <label htmlFor="post-request">

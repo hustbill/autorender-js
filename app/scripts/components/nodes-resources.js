@@ -98,14 +98,6 @@ class NodesResources extends React.Component {
       }
     ];
 
-    const data2 = [
-      {
-        color: 'green',
-        points: [{x: 2, y: 3}, {x: 4, y: 7}, {x: 9, y: 3}, {x: 11, y: 2},
-                  {x: 13, y: 2}, {x: 15, y: 3}]
-      }
-    ];
-
     const bardata = [
       {text: 'core1', value: 340},
       {text: 'core2', value: 280},
@@ -161,20 +153,30 @@ class NodesResources extends React.Component {
         }
       ]};
 
+      const data2 = [
+        {
+          color: 'green',
+          points: [{x: 2, y: 3}, {x: 4, y: 7}, {x: 9, y: 3}, {x: 11, y: 2},
+                    {x: 13, y: 2}, {x: 15, y: 3}]
+        }
+      ];
+
+        const secondObj = JSON.parse(JSON.stringify(dbresult), (key, value) => {
+            if (key === 'values') {
+              console.log(value);
+              cpuUsage.push(value);
+            }
+
+            // console.log(key);
+            // log the current property name, the last is "".
+            // console.log(value);
+            return value;     // return the unchanged property value.
+          });
+
+
     const margin = {top: 20, right: 20, bottom: 30, left: 40};
     const cpuUsage = [];
 
-    const secondObj = JSON.parse(JSON.stringify(dbresult), (key, value) => {
-      if (key === 'values') {
-        console.log(value);
-        cpuUsage.push(value);
-      }
-
-      // console.log(key);
-      // log the current property name, the last is "".
-      // console.log(value);
-      return value;     // return the unchanged property value.
-    });
 
 
     return (
@@ -183,13 +185,13 @@ class NodesResources extends React.Component {
         <div style={{width: '20%', height: '%15'}}>
           <LineChart
             title={'Concurrent User'}
-            width={600}
-            height={400}
+            width={480}
+            height={320}
             data={data}
           />
           <LineChart
-            width={600}
-            height={400}
+            width={480}
+            height={320}
             data={data2}
           />
         </div>
@@ -198,23 +200,23 @@ class NodesResources extends React.Component {
             title={'Usage per Core'}
             data={bardata}
             width={480}
-            height={340}
+            height={320}
             margin={margin}
             onClick={this.handleMouseEnter}
            />
         </div>
         <div>
           <textarea
-            style={{width: 540, height: 20, borderColor: 'gray', borderWidth: 2}}
+            style={{width: 400, height: 20, borderColor: 'gray', borderWidth: 2}}
             value={JSON.stringify(dbresult)} name="monitor" onChange={this.handleChange} />
           <br />
           <br />
           <textarea
-            style={{width: 640, height: 150, borderColor: 'gray', borderWidth: 2}}
+            style={{width: 480, height: 20, borderColor: 'gray', borderWidth: 2}}
             value={cpuUsage[0][1]} name="monitor1" onChange={this.handleChange} />
           <br />
           <textarea
-            style={{width: 640, height: 150, borderColor: 'gray', borderWidth: 2}}
+            style={{width: 480, height: 50, borderColor: 'gray', borderWidth: 2}}
             value={secondObj} name="monitor2" onChange={this.handleChange} />
           <br />
           <br />
