@@ -32,16 +32,6 @@ const influx = new Influx.InfluxDB({
   ]
 });
 
-export function getUserData() {
-  return influx.query(`
-           select * from concurrentuser
-           order by time desc
-           limit 3
-         `).then((rows) => {
-           console.log(rows);
-         });
-}
-
 class NodesResources extends React.Component {
   constructor(props, context) {
     super(props, context);
@@ -59,12 +49,6 @@ class NodesResources extends React.Component {
     fetch(cmd)
     .then(result => result.json())
     .then(items => this.setState({items}));
-    /* influx.query(`
-       select * from concurrentuser
-       order by time desc
-       limit 3`)
-     .then(result => result.json())
-     .then(items => this.setState({items})); */
   }
 
 
@@ -83,7 +67,6 @@ class NodesResources extends React.Component {
        limit 5
      `).then((rows) => {
        this.setState({state: rows.value});
-       console.log(rows);
      });
     ev.preventDefault();
   }
@@ -140,7 +123,6 @@ class NodesResources extends React.Component {
           // { text: '2017-05-05T01:51:03.514798957Z', value: 3 }
           convertResult.push(row);
         }
-        console.log(convertResult);
       }
 
       return convertResult;
@@ -161,14 +143,27 @@ class NodesResources extends React.Component {
             data={data2}
           />
         </div>
-        <div style={{width: '20%', height: '%15', display: 'flex', justifyContent: 'center', position: 'relative', top: 80, left: 280}}>
+        <div style={{width: '20%', height: '%15', display: 'flex', justifyContent: 'center', position: 'relative', top: 80, left: 380}}>
           <label htmlFor="cpu-usage">
             CPU Usage
           </label>
           <BarChart
+            title={'CPU Usage'}
+            data={convert(transform(this.state.items))}
+            width={420}
+            height={240}
+            margin={margin}
+            onClick={this.handleMouseEnter}
+           />
+        </div>
+        <div style={{width: '20%', height: '%15', display: 'flex', justifyContent: 'center', position: 'relative', top: 380, left: 0}}>
+          <label htmlFor="cpu-cores">
+            CPU Cores
+          </label>
+          <BarChart
             title={'Usage per Core'}
             data={convert(transform(this.state.items))}
-            width={400}
+            width={420}
             height={240}
             margin={margin}
             onClick={this.handleMouseEnter}
@@ -177,11 +172,7 @@ class NodesResources extends React.Component {
         <div>
           <textarea
             style={{width: 360, height: 20, borderColor: 'gray', borderWidth: 2}}
-            value={JSON.stringify(this.state.items)} name="monitor" onChange={this.handleChange} />
-          <br />
-          <textarea
-            style={{width: 360, height: 20, borderColor: 'gray', borderWidth: 2}}
-            value={convert(transform(this.state.items))[0].text} name="monitor1" onChange={this.handleChange} />
+            value={JSON.stringify(convert(transform(this.state.items))[0])} name="monitor" onChange={this.handleChange} />
           <br />
         </div>
       </div>
