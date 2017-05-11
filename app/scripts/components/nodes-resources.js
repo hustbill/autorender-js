@@ -1,152 +1,165 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import LineChart from 'react-linechart';
-import BarChart from 'react-bar-chart';
-import Influx from 'influx';
-import '../../styles/BarChart.css';
-import '../../styles/styles.css';
-import '../../styles/div.css';
+import {BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend} from 'recharts';
+// import Logo from './logo';
+import '../../styles/report.css';
 
-
-import Logo from './logo';
-// import ZoomWrapper from './zoom-wrapper';
 import {
   toggleTroubleshootingMenu,
   resetLocalViewState,
   clickDownloadGraph
 } from '../actions/app-actions';
 
+const margin = {top: 5, right: 30, left: 20, bottom: 5};
 
-const influx = new Influx.InfluxDB({
-  host: 'localhost',
-  database: 'workload',
-  schema: [
-    {
-      measurement: 'concurrentuser',
-      fields: {
-        appname: Influx.FieldType.STRING,
-        value: Influx.FieldType.INTEGER
-      },
-      tags: [
-        'host'
-      ]
-    }
+//
+/*
+* Using the reviver parameter
+* ref: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse
+* values =[
+  [
+      "2015-01-29T21:55:43.702900257Z",
+      2
+  ],
+  [
+      "2015-01-29T21:55:43.702900257Z",
+      0.55
+  ],
+  [
+      "2015-06-11T20:46:02Z",
+      0.64
   ]
-});
-
-
-const totalValues = Math.random() * 50;
-
-/**
- * Get the array of x and y pairs.
- * The function tries to avoid too large changes of the chart.
- * @param {number} total Total number of values.
- * @returns {Array} Array of data.
- * @private
- */
-
-function getRandomSeriesData(total) {
-  const points = [];
-  let lastY = (Math.random() * 40) - 20;
-  let y;
-  const firstY = lastY;
-  for (let i = 0; i < total; i += 1) {
-    y = ((Math.random() * firstY) - (firstY / 2)) + lastY;
-    points.push({
-      x: i,
-      y: Math.abs(y)
-    });
-    lastY = Math.abs(y);
-  }
-  console.log(points);
-
-  return points;
-}
-
-// Using the reviver parameter
-// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse
-function transform(result) {
-  const parseData = [];
+]
+*/
+function getValues(result) {
+  const values = [];
   JSON.parse(JSON.stringify(result), (key, value) => {
     if (key === 'values') {
-      parseData.push(value);
+      values.push(value);
     }
     // console.log(key); // log the current property name, the last is "".
     return value;     // return the unchanged property value.
   });
-  return parseData;
+  // console.log(values);
+  return values;
 }
 
-function convert(cpuData) {
-  const convertResult = [];
+/*
+*  input:  { '2017-05-05T01:51:03.514798957Z', 3 }
+*  output: { name: '01:51:03', value: 3 }
+*/
+function getNetSeries(rxValues, txValues) {
+  const rows = [];
   let hhmmss;
-  if (cpuData !== null && cpuData.length !== 0) {
+  if (rxValues !== null && rxValues.length !== 0) {
     let row = {};
     let i = 0;
-    for (; i < cpuData[0].length; i += 1) {
-      hhmmss = cpuData[0][i][0].substring('2017-05-05T'.length, '2017-05-05T'.length + '01:51:03'.length);
-      row = {text: hhmmss, value: cpuData[0][i][2]};
-      // { text: '2017-05-05T01:51:03.514798957Z', value: 3 }
-      convertResult.push(row);
+    for (; i < rxValues[0].length; i += 1) {
+      hhmmss = rxValues[0][i][0].substring('2017-05-05T'.length, '2017-05-05T'.length + '01:51:03'.length);
+      row = {
+        name: hhmmss,
+        Net_Rx_BW: rxValues[0][i][2],
+        Net_Tx_BW: txValues[0][i][2]
+      };
+      rows.push(row);
     }
   }
-  console.log(convertResult);
-  return convertResult;
+  return rows;
+}
+
+function getQpsSeries(values) {
+  const rows = [];
+  let hhmmss;
+  if (values !== null && values.length !== 0) {
+    let row = {};
+    let i = 0;
+    for (; i < values[0].length; i += 1) {
+      hhmmss = values[0][i][0].substring('2017-05-05T'.length, '2017-05-05T'.length + '01:51:03'.length);
+      row = {
+        name: hhmmss,
+        QPS: values[0][i][2]
+      };
+      rows.push(row);
+    }
+  }
+  // console.log(rows);
+  return rows;
+}
+
+function getCPUSeries(values) {
+  const rows = [];
+  let hhmmss;
+  if (values !== null && values.length !== 0) {
+    let row = {};
+    let i = 0;
+    for (; i < values[0].length; i += 1) {
+      hhmmss = values[0][i][0].substring('2017-05-05T'.length, '2017-05-05T'.length + '01:51:03'.length);
+      row = {
+        name: hhmmss,
+        CPU_Usage: values[0][i][2]
+      };
+      rows.push(row);
+    }
+  }
+  // console.log(rows);
+  return rows;
+}
+
+function getCPUCoresSeries(values) {
+  const rows = [];
+  let hhmmss;
+  if (values !== null && values.length !== 0) {
+    let row = {};
+    let i = 0;
+    for (; i < values[0].length; i += 1) {
+      hhmmss = values[0][i][0].substring('2017-05-05T'.length, '2017-05-05T'.length + '01:51:03'.length);
+      row = {
+        name: hhmmss,
+        CPU_Cores: values[0][i][2]
+      };
+      rows.push(row);
+    }
+  }
+  // console.log(rows);
+  return rows;
+}
+
+function getTwoSeries(latencyValues, latencyFiftyValues) {
+  const rows = [];
+  let hhmmss;
+  if (latencyValues !== null && latencyValues.length !== 0) {
+    let row = {};
+    let i = 0;
+    for (; i < latencyValues[0].length; i += 1) {
+      hhmmss = latencyValues[0][i][0].substring('2017-05-05T'.length, '2017-05-05T'.length + '01:51:03'.length);
+      row = {
+        name: hhmmss,
+        'latency_99%': latencyValues[0][i][2],
+        'latency_50%': latencyFiftyValues[0][i][2]
+      };
+      rows.push(row);
+    }
+  }
+  // console.log(rows);
+  return rows;
 }
 
 /*
-function getLatencyData(latency) {
-  const points = [];
-  let y;
-  for (let i = 0; i < latency; i += 1) {
-    points.push({
-      x: i,
-      y: Math.abs(y)
-    });
-  }
-  console.log(points);
-  return points;
-} */
-
-/*
-*  items: { text: '01:51:03', value: 3 }
+*  cpuCores: { text: '01:51:03', value: 3 }
 */
 class NodesResources extends React.Component {
   constructor(props, context) {
     super(props, context);
     this.state = {
-      items: [],
+      cpuUsage: [],
       cpuCores: [],
       latency: [],
       latencyFifty: [],
       qps: [],
-      series: [
-        {
-          title: 'Apples',
-          disabled: false,
-          data: [
-            {
-              color: 'steelblue',
-              label: 'ConcurrentUser',
-              points: getRandomSeriesData(totalValues)
-            }
-          ]
-        },
-        {
-          title: 'Bananas',
-          disabled: false,
-          data: [
-            {
-              color: 'green',
-              label: 'ConcurrentUser',
-              points: getRandomSeriesData(totalValues)
-            }
-          ]
-        }
-      ]
+      netRxBw: [],
+      netTxBw: []
     };
     this.handleMouseEnter = this.handleMouseEnter.bind(this);
-    this.querydb = this.querydb.bind(this);
   }
 
   componentDidMount() {
@@ -157,7 +170,7 @@ class NodesResources extends React.Component {
     const cmd = host.concat(q);
     fetch(cmd)
     .then(result => result.json())
-    .then(items => this.setState({items}));
+    .then(cpuUsage => this.setState({cpuUsage}));
 
     // cpu_cores
     const q1 = 'q=SELECT appname, value from cpu_cores limit 7';
@@ -168,7 +181,7 @@ class NodesResources extends React.Component {
 
 
     // latency99
-    const q2 = 'q=SELECT appname, value from latency_99spercentile limit 6';
+    const q2 = 'q=SELECT appname, value from latency_99spercentile limit 7';
     const cmd2 = host.concat(q2);
     fetch(cmd2)
         .then(result => result.json())
@@ -188,11 +201,26 @@ class NodesResources extends React.Component {
         .then(result => result.json())
         .then(qps => this.setState({qps}));
 
-    const q5 = 'q=SELECT appname, value from latency_50percentile limit 7';
+    // qps
+    const q5 = 'q=SELECT appname, value from qps limit 7';
     const cmd5 = host.concat(q5);
     fetch(cmd5)
-      .then(result => result.json())
-      .then(series => this.setState({series}));
+        .then(result => result.json())
+        .then(qps => this.setState({qps}));
+
+    // net_rx_bw
+    const q6 = 'q=SELECT appname, value from net_rx_bw limit 7';
+    const cmd6 = host.concat(q6);
+    fetch(cmd6)
+        .then(result => result.json())
+        .then(netRxBw => this.setState({netRxBw}));
+
+    // net_tx_bw
+    const q7 = 'q=SELECT appname, value from net_tx_bw limit 7';
+    const cmd7 = host.concat(q7);
+    fetch(cmd7)
+        .then(result => result.json())
+        .then(netTxBw => this.setState({netTxBw}));
   }
 
   handleMouseEnter(ev) {
@@ -201,116 +229,68 @@ class NodesResources extends React.Component {
     this.props.enterEdge(ev.currentTarget.id);
   }
 
-  querydb(ev) {
-    // const result = `${this.state.appname} : ${this.state.value}`;
-    influx.query(`
-       select * from concurrentuser
-       order by time desc
-       limit 5
-     `).then((rows) => {
-       this.setState({state: rows.value});
-     });
-    ev.preventDefault();
-  }
-
   render() {
-    const margin = {top: 20, right: 20, bottom: 30, left: 40};
-    const {series} = this.state;
+    const {cpuUsage, cpuCores, qps, latency, latencyFifty, netRxBw, netTxBw} = this.state;
+    const cpuUsageSeries = getCPUSeries(getValues(cpuUsage));
+    const cpuCoresSeries = getCPUCoresSeries(getValues(cpuCores));
+    const qpsSeries = getQpsSeries(getValues(qps));
+    const latencySeries = getTwoSeries(getValues(latency), getValues(latencyFifty));
+    const netRxTxSeries = getNetSeries(getValues(netRxBw), getValues(netTxBw));
+    console.log(JSON.stringify(qpsSeries));
 
     return (
-      <div className="nodes-resources">
-        <Logo transform="translate(24,24) scale(0.25)" />
-        <div style={{display: 'flex', justifyContent: 'center', position: 'relative', width: 640, height: 400, top: 150, left: 100, border: 3}}>
-          <label htmlFor="cpu-usage" style={{display: 'flex', justifyContent: 'center', position: 'relative', width: 120, height: 40, top: 10, left: 250, border: 3}} >
-            Concurrent User
-          </label>
-          <LineChart
-            title={'Concurrent User'}
-            width={600}
-            height={400}
-            data={this.state.series[0].data}
-          />
-          <LineChart
-            width={600}
-            height={400}
-            data={this.state.series[1].data}
-          />
-        </div>
-        <div style={{display: 'flex', justifyContent: 'center', position: 'relative', width: 420, height: 240, top: 350, left: 350, border: 3}}>
-          <label htmlFor="cpu-usage">
-            CPU Usage
-          </label>
-          <BarChart
-            title={'CPU Usage'}
-            data={convert(transform(this.state.items))}
-            width={420}
-            height={240}
-            margin={margin}
-            onClick={this.handleMouseEnter}
-           />
-        </div>
-        <div style={{display: 'flex', justifyContent: 'center', position: 'relative', width: 420, height: 240, top: 500, left: 350, border: 3}}>
-          <label htmlFor="latency-99">
-            Latency 99%
-          </label>
-          <BarChart
-            title={'Latency Ninty Nine'}
-            data={convert(transform(this.state.latency))}
-            width={420}
-            height={240}
-            margin={margin}
-            onClick={this.handleMouseEnter}
-           />
-        </div>
-        <div style={{display: 'flex', justifyContent: 'center', position: 'relative', width: 420, height: 240, top: -130, left: 850, border: 3}}>
-          <label htmlFor="cpu-cores">
-            CPU Usage per Core
-          </label>
-          <BarChart
-            title={'CPU Usage per Core'}
-            data={convert(transform(this.state.cpuCores))}
-            width={420}
-            height={240}
-            margin={margin}
-            onClick={this.handleMouseEnter}
-           />
-        </div>
-        <div style={{display: 'flex', justifyContent: 'center', position: 'relative', width: 420, height: 340, top: 20, left: 850, border: 3}}>
-          <label htmlFor="latency-fiftypercent">
-            Latency 50%
-          </label>
-          <BarChart
-            title={'Latency Fifty Percentage'}
-            data={convert(transform(this.state.latencyFifty))}
-            width={420}
-            height={240}
-            margin={margin}
-            onClick={this.handleMouseEnter}
-           />
-        </div>
-        <div style={{display: 'flex', justifyContent: 'center', position: 'relative', width: 420, height: 240, top: 30, left: 350, border: 3}}>
-          <label htmlFor="qps">
-            QPS
-          </label>
-          <BarChart
-            title={'QPS'}
-            data={convert(transform(this.state.qps))}
-            width={420}
-            height={240}
-            margin={margin}
-            onClick={this.handleMouseEnter}
-           />
-        </div>
-        <div style={{display: 'flex', justifyContent: 'center', position: 'relative', width: 420, height: 240, top: 150, left: 450, border: 3}}>
-          <textarea
-            value={series[0].data.points} name="monitor" onChange={this.handleChange} />
-          <br />
-        </div>
+      <div id="container">
+        <LineChart width={600} height={300} data={netRxTxSeries} margin={margin}>
+          <XAxis dataKey="name" />
+          <YAxis />
+          <CartesianGrid strokeDasharray="3 3" />
+          <Tooltip />
+          <Legend />
+          <Line type="monotone" dataKey="Net_Rx_BW" stroke="steelblue" activeDot={{r: 8}} />
+          <Line type="monotone" dataKey="Net_Tx_BW" stroke="darkred" />
+        </LineChart>
+        <br />
+        <LineChart width={600} height={300} data={latencySeries} margin={margin}>
+          <XAxis dataKey="name" />
+          <YAxis />
+          <CartesianGrid strokeDasharray="3 3" />
+          <Tooltip />
+          <Legend />
+          <Line type="monotone" dataKey="latency_99%" stroke="#8884d8" activeDot={{r: 8}} />
+          <Line type="monotone" dataKey="latency_50%" stroke="#82ca9d" />
+        </LineChart>
+        <br />
+        <BarChart width={600} height={300} data={cpuCoresSeries} margin={margin}>
+          <XAxis dataKey="name" />
+          <YAxis />
+          <CartesianGrid strokeDasharray="3 3" />
+          <Tooltip />
+          <Legend />
+          <Bar dataKey="CPU_Cores" fill="#82ca9d" />
+        </BarChart>
+        <br />
+        <LineChart width={600} height={300} data={cpuUsageSeries} margin={margin}>
+          <XAxis dataKey="name" />
+          <YAxis />
+          <CartesianGrid strokeDasharray="3 3" />
+          <Tooltip />
+          <Legend />
+          <Line type="monotone" dataKey="CPU_Usage" stroke="darkblue" activeDot={{r: 8}} />
+        </LineChart>
+        <br />
+        <LineChart width={600} height={300} data={qpsSeries} margin={margin}>
+          <XAxis dataKey="name" />
+          <YAxis />
+          <CartesianGrid strokeDasharray="3 3" />
+          <Tooltip />
+          <Legend />
+          <Line type="monotone" dataKey="QPS" stroke="darkorange" activeDot={{r: 8}} />
+        </LineChart>
+        <br />
       </div>
     );
   }
 }
-//
 
 export default connect(null, {
   toggleTroubleshootingMenu,
