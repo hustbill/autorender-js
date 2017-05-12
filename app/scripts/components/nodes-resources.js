@@ -1,18 +1,11 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import {BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend} from 'recharts';
-// import Logo from './logo';
 import '../../styles/report.css';
 
-import {
-  toggleTroubleshootingMenu,
-  resetLocalViewState,
-  clickDownloadGraph
-} from '../actions/app-actions';
-
 const margin = {top: 5, right: 30, left: 20, bottom: 5};
+const host = 'http://localhost:8086/query?pretty=true&p=root&u=root&db=workload&rpovh=&';
 
-//
 /*
 * Using the reviver parameter
 * ref: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse
@@ -24,10 +17,6 @@ const margin = {top: 5, right: 30, left: 20, bottom: 5};
   [
       "2015-01-29T21:55:43.702900257Z",
       0.55
-  ],
-  [
-      "2015-06-11T20:46:02Z",
-      0.64
   ]
 ]
 */
@@ -40,7 +29,6 @@ function getValues(result) {
     // console.log(key); // log the current property name, the last is "".
     return value;     // return the unchanged property value.
   });
-  // console.log(values);
   return values;
 }
 
@@ -82,7 +70,6 @@ function getQpsSeries(values) {
       rows.push(row);
     }
   }
-  // console.log(rows);
   return rows;
 }
 
@@ -101,7 +88,6 @@ function getCPUSeries(values) {
       rows.push(row);
     }
   }
-  // console.log(rows);
   return rows;
 }
 
@@ -120,7 +106,6 @@ function getCPUCoresSeries(values) {
       rows.push(row);
     }
   }
-  // console.log(rows);
   return rows;
 }
 
@@ -140,7 +125,6 @@ function getTwoSeries(latencyValues, latencyFiftyValues) {
       rows.push(row);
     }
   }
-  // console.log(rows);
   return rows;
 }
 
@@ -163,8 +147,6 @@ class NodesResources extends React.Component {
   }
 
   componentDidMount() {
-    const host = 'http://localhost:8086/query?pretty=true&p=root&u=root&db=workload&rpovh=&';
-    // const q = 'q=SELECT appname, value from cpu_usage limit 7';
     // cpu_usage
     const q = 'q=SELECT appname, value from cpu_usage limit 7';
     const cmd = host.concat(q);
@@ -236,18 +218,31 @@ class NodesResources extends React.Component {
     const qpsSeries = getQpsSeries(getValues(qps));
     const latencySeries = getTwoSeries(getValues(latency), getValues(latencyFifty));
     const netRxTxSeries = getNetSeries(getValues(netRxBw), getValues(netTxBw));
-    console.log(JSON.stringify(qpsSeries));
-
     return (
       <div id="container">
-        <LineChart width={600} height={300} data={netRxTxSeries} margin={margin}>
+        { /* <div className="gridster">
+          <ul>
+            <li data-row="1" data-col="1" data-sizex="1" data-sizey="1">
+              <div data-id="karma" data-view="Number"
+               data-title="Karma" style={{backgroundColor: '#96bf48'}} />
+            </li>
+            <li data-row="1" data-col="1" data-sizex="1" data-sizey="1">
+              <div data-id="valuation"
+                data-view="Number" data-title="Current Valuation" data-prefix="$" />
+            </li>
+          </ul>
+        </div> */ }
+        <textarea
+          style={{width: 1000, height: 160, borderColor: 'gray', borderWidth: 5}}
+          value={JSON.stringify(qps)} name="data" />
+        <br />
+        <LineChart width={600} height={300} data={qpsSeries} margin={margin}>
           <XAxis dataKey="name" />
           <YAxis />
           <CartesianGrid strokeDasharray="3 3" />
           <Tooltip />
           <Legend />
-          <Line type="monotone" dataKey="Net_Rx_BW" stroke="steelblue" activeDot={{r: 8}} />
-          <Line type="monotone" dataKey="Net_Tx_BW" stroke="darkred" />
+          <Line type="monotone" dataKey="QPS" stroke="steelblue" activeDot={{r: 8}} />
         </LineChart>
         <br />
         <LineChart width={600} height={300} data={latencySeries} margin={margin}>
@@ -258,6 +253,16 @@ class NodesResources extends React.Component {
           <Legend />
           <Line type="monotone" dataKey="latency_99%" stroke="#8884d8" activeDot={{r: 8}} />
           <Line type="monotone" dataKey="latency_50%" stroke="#82ca9d" />
+        </LineChart>
+        <br />
+        <LineChart width={600} height={300} data={netRxTxSeries} margin={margin}>
+          <XAxis dataKey="name" />
+          <YAxis />
+          <CartesianGrid strokeDasharray="3 3" />
+          <Tooltip />
+          <Legend />
+          <Line type="monotone" dataKey="Net_Rx_BW" stroke="steelblue" activeDot={{r: 8}} />
+          <Line type="monotone" dataKey="Net_Tx_BW" stroke="darkred" />
         </LineChart>
         <br />
         <BarChart width={600} height={300} data={cpuCoresSeries} margin={margin}>
@@ -278,22 +283,9 @@ class NodesResources extends React.Component {
           <Line type="monotone" dataKey="CPU_Usage" stroke="darkblue" activeDot={{r: 8}} />
         </LineChart>
         <br />
-        <LineChart width={600} height={300} data={qpsSeries} margin={margin}>
-          <XAxis dataKey="name" />
-          <YAxis />
-          <CartesianGrid strokeDasharray="3 3" />
-          <Tooltip />
-          <Legend />
-          <Line type="monotone" dataKey="QPS" stroke="darkorange" activeDot={{r: 8}} />
-        </LineChart>
-        <br />
       </div>
     );
   }
 }
 
-export default connect(null, {
-  toggleTroubleshootingMenu,
-  resetLocalViewState,
-  clickDownloadGraph
-})(NodesResources);
+export default connect(null)(NodesResources);

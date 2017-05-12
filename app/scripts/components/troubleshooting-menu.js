@@ -1,12 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import {
-  toggleTroubleshootingMenu,
-  resetLocalViewState,
-  clickDownloadGraph
-} from '../actions/app-actions';
-
 // -d 'dpdk|192.168.122.224:50051|
 //  10.0.5.4/0,10.0.207.0/8,0/0,0/0,0/0;sum,volume,1000;32,32,8,16,16;100'
 class DebugMenu extends React.Component {
@@ -25,19 +19,14 @@ class DebugMenu extends React.Component {
     });
   }
 
-  alertValue() {
-    alert(this.state.value);
-  }
-
   handleChange(e) {
     this.setState({[e.target.name]: e.target.value});
   }
 
-
+/*
+ const result = `${this.state.data} : ${this.state.monitor}`;
+*/
   handleSubmit(ev) {
-    const result = `${this.state.data} : ${this.state.monitor}`;
-    // alert(str);
-    console.log(result);
     const blob = new Blob(this.state.data, {type: 'text/plain'});
     fetch(this.state.monitor, {
       method: 'POST',
@@ -47,8 +36,6 @@ class DebugMenu extends React.Component {
       },
       body: blob
     });
-
-    console.log(this.state.data);
     ev.preventDefault();
   }
 
@@ -59,7 +46,7 @@ class DebugMenu extends React.Component {
           <h3>Network Control & Monitor</h3>
           <h4>{new Date().toLocaleTimeString()}</h4>
           <h4>{this.props.name}</h4>
-          <div className="troubleshooting-menu-item" style={{height: 400, width: 600}}>
+          <div className="troubleshooting-menu-item" style={{height: 600, width: 800}}>
             <h4>Post Request to Monitor Server:</h4>
             <form onSubmit={this.handleSubmit}>
               <label htmlFor="post-request">
@@ -67,7 +54,7 @@ class DebugMenu extends React.Component {
               </label>
               <br />
               <textarea
-                style={{width: 540, height: 240, borderColor: 'gray', borderWidth: 2}}
+                style={{width: 640, height: 360, borderColor: 'gray', borderWidth: 2}}
                 value={this.state.data} name="data" onChange={this.handleChange} />
               <br />
               <br />
@@ -90,8 +77,4 @@ class DebugMenu extends React.Component {
   }
 }
 
-export default connect(null, {
-  toggleTroubleshootingMenu,
-  resetLocalViewState,
-  clickDownloadGraph
-})(DebugMenu);
+export default connect(null)(DebugMenu);

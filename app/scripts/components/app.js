@@ -1,7 +1,6 @@
 import debug from 'debug';
 import React from 'react';
 import { connect } from 'react-redux';
-
 import Logo from './logo';
 // import Footer from './footer';
 import Sidebar from './sidebar';

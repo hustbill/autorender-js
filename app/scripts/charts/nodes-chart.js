@@ -23,7 +23,6 @@ const EdgeMarkerDefinition = ({ selectedNodeId }) => {
         refY="3.5"
         markerWidth={markerSize}
         markerHeight={markerSize}
-        label="label"
         orient="auto">
         <polygon className="link" points="0 0, 10 3.5, 0 7" />
       </marker>
