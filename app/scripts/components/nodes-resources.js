@@ -2,8 +2,6 @@ import React from 'react';
 import { connect } from 'react-redux';
 import {BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend} from 'recharts';
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
-import 'react-table/react-table.css';
-
 import '../../styles/report.css';
 import '../../styles/table-format.css';
 
