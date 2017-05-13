@@ -11,6 +11,8 @@ const transformedNode = (otherProps, { x, y, k, opacity }) => (
   // faster than adding a CSS class and controlling it from there.
   <g transform={`translate(${x},${y}) scale(${k})`} style={{opacity}}>
     <Node {...otherProps} />
+    { /* <text textAnchor="middle" pointerEvents="none"
+      fontSize="14px" fontColor="red" fill="#FFFFFF" x={x * 0.5} y={y * 0.5}>event2</text> */ }
   </g>
 );
 

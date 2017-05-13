@@ -30,6 +30,7 @@ class MetricSelector extends React.Component {
             />
           ))}
         </div>}
+
       </div>
     );
   }

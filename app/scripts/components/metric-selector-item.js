@@ -22,6 +22,7 @@ class MetricSelectorItem extends React.Component {
   onMouseClick() {
     const metricType = this.props.metric.get('label');
     const pinnedMetricType = this.props.pinnedMetricType;
+    console.log(metricType);
 
     if (metricType !== pinnedMetricType) {
       this.props.pinMetric(metricType);
@@ -32,7 +33,9 @@ class MetricSelectorItem extends React.Component {
 
   render() {
     const { metric, selectedMetricType, pinnedMetricType } = this.props;
-    const type = metric.get('label');
+    /* const type = metric.get('label'); */
+    console.log(metric);
+    const type = 'Latency';
     const isPinned = (type === pinnedMetricType);
     const isSelected = (type === selectedMetricType);
     const className = classNames('metric-selector-action', {
@@ -47,6 +50,10 @@ class MetricSelectorItem extends React.Component {
         onClick={this.onMouseClick}>
         {type}
         {isPinned && <span className="fa fa-thumb-tack" />}
+        <textarea
+          style={{width: 300, height: 20, borderColor: 'red', borderWidth: 2}}
+          value={'Check Latency and QPS'} name="data" />
+        <br />
       </div>
     );
   }

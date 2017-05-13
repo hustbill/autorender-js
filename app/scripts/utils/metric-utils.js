@@ -5,6 +5,8 @@ import React from 'react';
 import { formatMetricSvg } from './string-utils';
 import { colors } from './color-utils';
 
+let randomVal = (Math.floor(Math.random() * 50) + 1) / 100;
+
 export function getClipPathDefinition(clipId, height, radius) {
   const barHeight = 1 - (2 * height); // in the interval [-1, 1]
   return (
@@ -19,8 +21,8 @@ export function getClipPathDefinition(clipId, height, radius) {
 //
 // loadScale(1) == 0.5; E.g. a nicely balanced system :).
 const loadScale = scaleLog().domain([0.01, 100]).range([0, 1]);
-
-
+/*
+/*
 export function getMetricValue(metric) {
   if (!metric) {
     return {height: 0, value: null, formattedValue: 'n/a'};
@@ -48,6 +50,36 @@ export function getMetricValue(metric) {
     hasMetric: value !== null,
     formattedValue: formatMetricSvg(value, m)
   };
+} */
+
+export function getMetricValue(metric) {
+  randomVal = (Math.floor(Math.random() * 50) + 1) / 100;
+  if (!metric) {
+    return {height: 0, value: null, formattedValue: 'n/a'};
+  }
+  const m = metric.toJS();
+  const value = m.value;
+
+  let valuePercentage = value === 0 ? 0 : value / m.max;
+  let max = m.max;
+  if (includes(['load1', 'load5', 'load15'], m.id)) {
+    valuePercentage = loadScale(value);
+    max = null;
+  }
+
+  let displayedValue = Number(value).toFixed(1);
+  if (displayedValue > 0 && (!max || displayedValue < max)) {
+    const baseline = 0.1;
+    displayedValue = randomVal + (valuePercentage * (1 - (baseline * 2))) + baseline;
+  } else if (displayedValue >= m.max && displayedValue > 0) {
+    displayedValue = 1;
+  }
+
+  return {
+    height: displayedValue,
+    hasMetric: value !== null,
+    formattedValue: formatMetricSvg(value, m)
+  };
 }
 
 
@@ -63,5 +95,5 @@ export function getMetricColor(metric) {
   } else if (/load/.test(metricId)) {
     return colors('load');
   }
-  return 'steelBlue';
+  return 'red';
 }
