@@ -28,14 +28,7 @@ class Edge extends React.Component {
     const thickness = (scale * 0.01) * NODE_BASE_SIZE;
     const strokeWidth = focused ? thickness * 3 : thickness;
     const shouldRenderMarker = (focused || highlighted) && (source !== target);
-    console.log(target);
-    console.log(source);
-    console.log(path);
-    /* const d = {path};
-    console.log(d);
-    const dx = d.target.x - d.source.x;
-    const dy = d.target.y - d.source.y; */
-    const strokeColor = (focused || highlighted) ? 'red' : 'white';
+
     // Draws the edge so that its thickness reflects the zoom scale.
     // Edge shadow is always made 10x thicker than the edge itself.
     return (
@@ -44,17 +37,13 @@ class Edge extends React.Component {
         onMouseEnter={this.handleMouseEnter}
         onMouseLeave={this.handleMouseLeave}
       >
-        <path className="shadow" d={path} style={{ strokeWidth: 10 * strokeWidth, stroke: 'red' }} />
+        <path className="shadow" d={path} style={{ strokeWidth: 10 * strokeWidth }} />
         <path
           className="link"
           d={path}
           markerEnd={shouldRenderMarker ? 'url(#end-arrow)' : null}
           strokeWidth={strokeWidth}
-          stroke={strokeColor}
         />
-        <path id="lineAB" d={path} stroke="red" strokeWidth="3" fill="none" />
-        <circle d={path} r="20" fill="green" />
-        <circle d={path} r="80" fill="purple" />
         { /*
                 <text
                   textAnchor="middle"

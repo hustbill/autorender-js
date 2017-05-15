@@ -2,10 +2,10 @@ import { includes } from 'lodash';
 import { scaleLog } from 'd3-scale';
 import React from 'react';
 
-import { formatMetricSvg } from './string-utils';
+// import { formatMetricSvg } from './string-utils';
 import { colors } from './color-utils';
 
-let randomVal = (Math.floor(Math.random() * 50) + 1) / 100;
+let randomVal = (Math.floor(Math.random() * 50) + 20) / 100;
 
 export function getClipPathDefinition(clipId, height, radius) {
   const barHeight = 1 - (2 * height); // in the interval [-1, 1]
@@ -78,7 +78,8 @@ export function getMetricValue(metric) {
   return {
     height: displayedValue,
     hasMetric: value !== null,
-    formattedValue: formatMetricSvg(value, m)
+    formattedValue: (displayedValue * 300).toFixed(1)
+    // formattedValue: formatMetricSvg(value, m)
   };
 }
 
@@ -86,9 +87,9 @@ export function getMetricValue(metric) {
 export function getMetricColor(metric) {
   const metricId = metric && metric.get('id');
   if (/mem/.test(metricId)) {
-    return 'steelBlue';
+    return '#F44E3B';
   } else if (/cpu/.test(metricId)) {
-    return colors('cpu');
+    return 'lightred'; /* colors('cpu'); */
   } else if (/files/.test(metricId)) {
     // purple
     return '#9467bd';

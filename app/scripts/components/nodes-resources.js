@@ -6,7 +6,8 @@ import '../../styles/report.css';
 import '../../styles/table-format.css';
 
 const margin = {top: 5, right: 30, left: 20, bottom: 5};
-const host = 'http://10.145.240.216:8086/query?pretty=true&p=root&u=root&db=workload&rpovh=&';
+// const host = 'http://10.145.240.216:8086/query?pretty=true&p=root&u=root&db=workload&rpovh=&';
+const host = 'http://192.168.0.113:8086/query?pretty=true&p=root&u=root&db=workload&rpovh=&';
 const alertQuantity = Math.floor(Math.random() * 6) + 2;
 
 /*

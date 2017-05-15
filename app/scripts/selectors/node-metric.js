@@ -3,7 +3,7 @@ import { createMapSelector, createListSelector } from 'reselect-map';
 import { fromJS, Map as makeMap, List as makeList } from 'immutable';
 
 import { isGraphViewModeSelector, isResourceViewModeSelector } from '../selectors/topology';
-import { RESOURCE_VIEW_METRICS } from '../constants/resources';
+// import { RESOURCE_VIEW_METRICS } from '../constants/resources';
 
 
 // Resource view uses the metrics of the nodes from the cache, while the graph and table
@@ -30,9 +30,9 @@ export const availableMetricsSelector = createSelector(
 
     // In resource view, we're displaying only the hardcoded CPU and Memory metrics.
     // TODO: Make this dynamic as well.
-    if (isResourceView) {
+    /* if (isResourceView) {
       return fromJS(RESOURCE_VIEW_METRICS);
-    }
+    } */
 
     // Don't show any metrics in the table view mode.
     return makeList();
