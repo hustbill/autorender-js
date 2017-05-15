@@ -22,7 +22,7 @@ var backendProxy = httpProxy.createProxy({
   ws: true,
   // target: 'http://' + BACKEND_HOST + ':4040'
   // target: 'http://' + WEAVE_SCOPE_APP_SERVICE_HOST
-   target: 'http://192.168.0.113:4040'
+   target: 'http://10.145.240.216:4040'
   // target: 'http://' + BACKEND_HOST  // export BACKEND_HOST=10.105.179.46
 });
 backendProxy.on('error', function(err) {
@@ -74,7 +74,7 @@ if (process.env.NODE_ENV !== 'production') {
  *
  *****************/
 
-var port = process.env.PORT || 4041;
+var port = process.env.PORT || 4043;
 var server = app.listen(port, function () {
   var host = server.address().address;
   var port = server.address().port;

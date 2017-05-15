@@ -46,13 +46,13 @@ function getNetSeries(rxValues, txValues) {
   let hhmmss;
   if (rxValues !== null && rxValues.length !== 0) {
     let row = {};
-    let i = 0;
-    for (; i < rxValues[0].length; i += 1) {
+    let i = rxValues[0].length - 1;
+    for (; i > 0; i -= 1) {
       hhmmss = rxValues[0][i][0].substring('2017-05-05T'.length, '2017-05-05T'.length + '01:51:03'.length);
       row = {
         name: hhmmss,
-        Net_Rx_BW: rxValues[0][i][2],
-        Net_Tx_BW: txValues[0][i][2]
+        'Net_Rx_BW(Kbps)': rxValues[0][i][2],
+        'Net_Tx_BW(Kbps)': txValues[0][i][2]
       };
       rows.push(row);
     }
@@ -65,8 +65,8 @@ function getQpsSeries(values) {
   let hhmmss;
   if (values !== null && values.length !== 0) {
     let row = {};
-    let i = 0;
-    for (; i < values[0].length; i += 1) {
+    let i = values[0].length - 1;
+    for (; i > 0; i -= 1) {
       hhmmss = values[0][i][0].substring('2017-05-05T'.length, '2017-05-05T'.length + '01:51:03'.length);
       row = {
         name: hhmmss,
@@ -83,8 +83,8 @@ function getCPUSeries(values) {
   let hhmmss;
   if (values !== null && values.length !== 0) {
     let row = {};
-    let i = 0;
-    for (; i < values[0].length; i += 1) {
+    let i = values[0].length - 1;
+    for (; i > 0; i -= 1) {
       hhmmss = values[0][i][0].substring('2017-05-05T'.length, '2017-05-05T'.length + '01:51:03'.length);
       row = {
         name: hhmmss,
@@ -101,8 +101,8 @@ function getCPUCoresSeries(values) {
   let hhmmss;
   if (values !== null && values.length !== 0) {
     let row = {};
-    let i = 0;
-    for (; i < values[0].length; i += 1) {
+    let i = values[0].length - 1;
+    for (; i > 0; i -= 1) {
       hhmmss = values[0][i][0].substring('2017-05-05T'.length, '2017-05-05T'.length + '01:51:03'.length);
       row = {
         name: hhmmss,
@@ -117,19 +117,28 @@ function getCPUCoresSeries(values) {
 function getTwoSeries(latencyValues, latencyFiftyValues) {
   const rows = [];
   let hhmmss;
+  let latencyVal;
+  let latencyFiftyVal;
   if (latencyValues !== null && latencyValues.length !== 0) {
     let row = {};
-    let i = 0;
-    for (; i < latencyValues[0].length; i += 1) {
+    let i = latencyValues[0].length - 1;
+    for (; i > 0; i -= 1) {
       hhmmss = latencyValues[0][i][0].substring('2017-05-05T'.length, '2017-05-05T'.length + '01:51:03'.length);
+      latencyVal = (latencyValues[0][i][2] * 1000).toFixed(1);
+      latencyFiftyVal = (latencyFiftyValues[0][i][2] * 1000).toFixed(1);
+      console.log('latencyFiftyVal');
+      console.log(latencyVal);
+      console.log(latencyFiftyVal);
       row = {
         name: hhmmss,
-        'latency_99%(ms)': (latencyValues[0][i][2] * 1000).toFixed(1),
-        'latency_50%(ms)': (latencyFiftyValues[0][i][2] * 1000).toFixed(1)
+        'latency_99%(ms)': latencyValues[0][i][2] * 1000,
+        'latency_50%(ms)': latencyFiftyValues[0][i][2] * 1000
       };
       rows.push(row);
     }
   }
+  console.log('Latency rows');
+  console.log(rows);
   return rows;
 }
 
@@ -177,6 +186,7 @@ class NodesResources extends React.Component {
   constructor(props, context) {
     super(props, context);
     this.state = {
+      seconds: 0,
       eqps: [],
       cpuUsage: [],
       cpuCores: [],
@@ -191,14 +201,14 @@ class NodesResources extends React.Component {
 
   componentDidMount() {
     // cpu_usage
-    const q = 'q=SELECT appname, value from cpu_usage limit 12';
+    const q = 'q=SELECT appname, value from cpu_usage order by time desc limit 12';
     const cmd = host.concat(q);
     fetch(cmd)
     .then(result => result.json())
     .then(cpuUsage => this.setState({cpuUsage}));
 
     // cpu_cores
-    const q1 = 'q=SELECT appname, value from cpu_cores limit 12';
+    const q1 = 'q=SELECT appname, value from cpu_cores order by time desc limit 12';
     const cmd1 = host.concat(q1);
     fetch(cmd1)
     .then(result => result.json())
@@ -206,35 +216,36 @@ class NodesResources extends React.Component {
 
 
     // latency99
-    const q2 = 'q=SELECT appname, value from latency_99spercentile WHERE time > now() - 1h limit 12';
+    const q2 = 'q=SELECT appname, value from latency_99spercentile order by time desc limit 12';
     const cmd2 = host.concat(q2);
     fetch(cmd2)
         .then(result => result.json())
         .then(latency => this.setState({latency}));
 
-    // latency99
-    const q3 = 'q=SELECT appname, value from latency_50percentile WHERE time > now() - 1h limit 12';
+    // latency50
+    const q3 = 'q=SELECT appname, value from latency_50percentile order by time desc limit 12';
+   // const q3 = 'q=SELECT appname, value from net_rx_bw limit 12';
     const cmd3 = host.concat(q3);
     fetch(cmd3)
         .then(result => result.json())
         .then(latencyFifty => this.setState({latencyFifty}));
 
     // qps
-    const q5 = 'q=SELECT appname, value from qps WHERE time > now() - 1h limit 12';
+    const q5 = 'q=SELECT appname, value from qps order by time desc limit 12';
     const cmd5 = host.concat(q5);
     fetch(cmd5)
         .then(result => result.json())
         .then(qps => this.setState({qps}));
 
     // net_rx_bw
-    const q6 = 'q=SELECT appname, value from net_rx_bw limit 12';
+    const q6 = 'q=SELECT appname, value from net_rx_bw order by time desc limit 12';
     const cmd6 = host.concat(q6);
     fetch(cmd6)
         .then(result => result.json())
         .then(netRxBw => this.setState({netRxBw}));
 
     // net_tx_bw
-    const q7 = 'q=SELECT appname, value from net_tx_bw limit 12';
+    const q7 = 'q=SELECT appname, value from net_tx_bw order by time desc limit 12';
     const cmd7 = host.concat(q7);
     fetch(cmd7)
         .then(result => result.json())
@@ -246,6 +257,18 @@ class NodesResources extends React.Component {
     fetch(cmd8)
         .then(result => result.json())
         .then(eqps => this.setState({eqps}));
+
+    this.interval = setInterval(this.tick.bind(this), 5000);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.interval);
+  }
+
+  tick() {
+    this.setState({
+      seconds: this.state.seconds + 5000
+    });
   }
 
   handleMouseEnter(ev) {
@@ -330,8 +353,8 @@ class NodesResources extends React.Component {
           <CartesianGrid strokeDasharray="3 3" />
           <Tooltip />
           <Legend />
-          <Line type="monotone" dataKey="Net_Rx_BW" stroke="darkmagenta" activeDot={{r: 8}} />
-          <Line type="monotone" dataKey="Net_Tx_BW" stroke="darkred" />
+          <Line type="monotone" dataKey="Net_Rx_BW(Kbps)" stroke="darkmagenta" activeDot={{r: 8}} />
+          <Line type="monotone" dataKey="Net_Tx_BW(Kbps)" stroke="darkred" />
         </LineChart>
         <br />
         <LineChart width={960} height={300} data={cpuUsageSeries} margin={margin}>
