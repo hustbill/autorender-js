@@ -6,8 +6,8 @@ import '../../styles/report.css';
 import '../../styles/table-format.css';
 
 const margin = {top: 5, right: 30, left: 20, bottom: 5};
-// const host = 'http://10.145.240.216:8086/query?pretty=true&p=root&u=root&db=workload&rpovh=&';
-const host = 'http://192.168.0.113:8086/query?pretty=true&p=root&u=root&db=workload&rpovh=&';
+const host = 'http://10.145.240.216:8086/query?pretty=true&p=root&u=root&db=workload&rpovh=&';
+// const host = 'http://192.168.0.113:8086/query?pretty=true&p=root&u=root&db=workload&rpovh=&';
 const alertQuantity = Math.floor(Math.random() * 6) + 2;
 
 /*
@@ -117,18 +117,11 @@ function getCPUCoresSeries(values) {
 function getTwoSeries(latencyValues, latencyFiftyValues) {
   const rows = [];
   let hhmmss;
-  let latencyVal;
-  let latencyFiftyVal;
   if (latencyValues !== null && latencyValues.length !== 0) {
     let row = {};
     let i = latencyValues[0].length - 1;
     for (; i > 0; i -= 1) {
       hhmmss = latencyValues[0][i][0].substring('2017-05-05T'.length, '2017-05-05T'.length + '01:51:03'.length);
-      latencyVal = (latencyValues[0][i][2] * 1000).toFixed(1);
-      latencyFiftyVal = (latencyFiftyValues[0][i][2] * 1000).toFixed(1);
-      console.log('latencyFiftyVal');
-      console.log(latencyVal);
-      console.log(latencyFiftyVal);
       row = {
         name: hhmmss,
         'latency_99%(ms)': latencyValues[0][i][2] * 1000,
@@ -137,8 +130,6 @@ function getTwoSeries(latencyValues, latencyFiftyValues) {
       rows.push(row);
     }
   }
-  console.log('Latency rows');
-  console.log(rows);
   return rows;
 }
 
@@ -179,6 +170,25 @@ function addAlerts(eqps, qps, latency, quantity) {
   return alerts;
 }
 
+// getAlertColor
+function getAlertColor(eqps, qps, latency, quantity) {
+  let alertColor = 'red';
+  const eqpsArr = getAlertArray(eqps);
+  const qpsArr = getAlertArray(qps);
+  const latencyArr = getAlertArray(latency);
+
+  for (let i = 1; i < quantity; i += 1) {
+    // const type = (Math.floor((Math.random() * 50) + 1) % 2) === 0 ? 'Latency' : 'QPS';
+    const latencyCur = (latencyArr[i] * 1000).toFixed(1);
+    if (qpsArr[i] < eqpsArr[i] || latencyCur > 210) {
+      alertColor = 'red';
+    } else {
+      alertColor = '#00ff00';
+    }
+  }
+  return alertColor;
+}
+
 /*
 *  cpuCores: { text: '01:51:03', value: 3 }
 */
@@ -201,6 +211,18 @@ class NodesResources extends React.Component {
 
   componentDidMount() {
     // cpu_usage
+
+    this.interval = setInterval(this.tick.bind(this), 5000);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.interval);
+  }
+
+  tick() {
+    this.setState({
+      seconds: this.state.seconds + 5000
+    });
     const q = 'q=SELECT appname, value from cpu_usage order by time desc limit 12';
     const cmd = host.concat(q);
     fetch(cmd)
@@ -257,18 +279,6 @@ class NodesResources extends React.Component {
     fetch(cmd8)
         .then(result => result.json())
         .then(eqps => this.setState({eqps}));
-
-    this.interval = setInterval(this.tick.bind(this), 5000);
-  }
-
-  componentWillUnmount() {
-    clearInterval(this.interval);
-  }
-
-  tick() {
-    this.setState({
-      seconds: this.state.seconds + 5000
-    });
   }
 
   handleMouseEnter(ev) {
@@ -288,22 +298,36 @@ class NodesResources extends React.Component {
 
     const alerts = addAlerts(getValues(eqps), getValues(qps), getValues(latency), alertQuantity);
     const tableStyle = {
-      border: '1px solid black'
+      border: '2px solid black',
+      borderCollapse: 'separate'
+    };
+
+    const alertColor = getAlertColor(
+      getValues(eqps),
+      getValues(qps),
+      getValues(latency),
+      alertQuantity);
+    console.log('alertColor');
+    console.log(alertColor);
+    const headerStyle = {
+      background: alertColor,
+      border: '2px solid black'
+    };
+    const tdStyle = {
+      border: '2px solid black',
+      colSpan: '14px',
+      width: '200px',
+      padding: '25px'
+    };
+    const thStyle = {
+      border: '10px solid black',
+      width: '200px',
+      backgroundColor: 'green',
+      colSpan: '14px',
+      padding: '25px'
     };
     return (
       <div id="container">
-        { /* <div className="gridster">
-          <ul>
-            <li data-row="1" data-col="1" data-sizex="1" data-sizey="1">
-              <div data-id="karma" data-view="Number"
-               data-title="Karma" style={{backgroundColor: '#96bf48'}} />
-            </li>
-            <li data-row="1" data-col="1" data-sizex="1" data-sizey="1">
-              <div data-id="valuation"
-                data-view="Number" data-title="Current Valuation" data-prefix="$" />
-            </li>
-          </ul>
-        </div> */ }
         <h1> Network Dashboard </h1>
         <br />
         <div className="col-md-offset-1 col-md-8">
@@ -314,14 +338,16 @@ class NodesResources extends React.Component {
               <BootstrapTable
                 rowStyle={{display: 'table-row'}}
                 tbodyStyle={{height: '14px'}}
-                headerStyle={{background: '#00ff00'}}
+                headerStyle={headerStyle}
+                tdStyle={tdStyle}
+                thStyle={thStyle}
                 tableStyle={tableStyle} data={alerts}>
-                <TableHeaderColumn dataField="id" isKey>ID</TableHeaderColumn>
-                <TableHeaderColumn dataField="alertType">Alert Type</TableHeaderColumn>
-                <TableHeaderColumn dataField="qpsReq">QPS Req</TableHeaderColumn>
-                <TableHeaderColumn dataField="qpsCur">QPS Current</TableHeaderColumn>
-                <TableHeaderColumn dataField="latencyReq">Latency Req</TableHeaderColumn>
-                <TableHeaderColumn dataField="latencyCur">Latency Current</TableHeaderColumn>
+                <TableHeaderColumn dataField="id" width="50px" isKey>ID</TableHeaderColumn>
+                <TableHeaderColumn dataField="alertType" width="100px">Alert Type</TableHeaderColumn>
+                <TableHeaderColumn dataField="qpsReq" width="100px">QPS Req</TableHeaderColumn>
+                <TableHeaderColumn dataField="qpsCur" width="100px">QPS</TableHeaderColumn>
+                <TableHeaderColumn dataField="latencyReq" width="100px">Latency Req</TableHeaderColumn>
+                <TableHeaderColumn dataField="latencyCur" width="100px">Latency</TableHeaderColumn>
               </BootstrapTable>
               <br />
             </div>

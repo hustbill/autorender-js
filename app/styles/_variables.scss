@@ -18,7 +18,7 @@ $background-average-color: mix($background-color, $background-lighter-color);
 $background-darker-color: lighten($background-color, 8%);
 $background-darker-secondary-color: lighten($background-color, 4%);
 $background-dark-color: $primary-color;  /* rgb(255, 51, 0) */
-$text-color: $primary-color; /* #DAA569; */
+$text-color: darkblue; /* $primary-color; */  /* #DAA569; */
 $text-secondary-color: darken($primary-color, 15%);
 $text-tertiary-color: darken($primary-color, 30%);
 $border-light-color: darken ($primary-color, 60%);
