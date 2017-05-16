@@ -148,22 +148,43 @@ function getAlertArray(values) {
   return rows;
 }
 
+function getAlertTimeArray(values) {
+  console.log('values');
+  console.log(values);
+  const rows = [];
+  if (values !== null && values.length !== 0) {
+    let row = {};
+    let i = 0;
+    for (; i < values[0].length; i += 1) {
+      row = values[0][i][0];
+      rows.push(row);
+    }
+  }
+  return rows;
+}
+
 // qpsSeries
 function addAlerts(eqps, qps, latency, quantity) {
+  const time = new Date();
+  let timeStr = time.toTimeString().slice(0, 8);
   const alerts = [];
+  const timeArr = getAlertTimeArray(qps);
   const eqpsArr = getAlertArray(eqps);
   const qpsArr = getAlertArray(qps);
   const latencyArr = getAlertArray(latency);
   const startId = alerts.length;
+
   for (let i = 1; i < quantity; i += 1) {
     const id = startId + i;
-    const type = (Math.floor((Math.random() * 50) + 1) % 2) === 0 ? 'Latency' : 'QPS';
+    if (timeArr !== null && timeArr.length !== 0) {
+      timeStr = timeArr[i].substring('2017-05-05T'.length, '2017-05-05T'.length + '01:51:03'.length);
+    }
     alerts.push({
       id,
-      alertType: type,
+      alertTime: timeStr,
       qpsReq: eqpsArr[i],
       qpsCur: qpsArr[i],
-      latencyReq: 210,
+      latencyReq: 195,
       latencyCur: (latencyArr[i] * 1000).toFixed(1)
     });
   }
@@ -289,16 +310,27 @@ class NodesResources extends React.Component {
 
   render() {
     const {eqps, cpuUsage, cpuCores, qps, latency, latencyFifty, netRxBw, netTxBw} = this.state;
-    const cpuUsageSeries = getCPUSeries(getValues(cpuUsage));
-    const cpuCoresSeries = getCPUCoresSeries(getValues(cpuCores));
-    const qpsSeries = getQpsSeries(getValues(qps));
+    const cpuUsageValues = getValues(cpuUsage);
+    const cpuUsageSeries = getCPUSeries(cpuUsageValues);
 
-    const latencySeries = getTwoSeries(getValues(latency), getValues(latencyFifty));
-    const netRxTxSeries = getNetSeries(getValues(netRxBw), getValues(netTxBw));
+    const cpuCoresValues = getValues(cpuCores);
+    const cpuCoresSeries = getCPUCoresSeries(cpuCoresValues);
 
-    const alerts = addAlerts(getValues(eqps), getValues(qps), getValues(latency), alertQuantity);
+    const qpsValues = getValues(qps);
+    const qpsSeries = getQpsSeries(qpsValues);
+
+
+    const latencyValues = getValues(latency);
+    const latencyFiftyValues = getValues(latencyFifty);
+    const latencySeries = getTwoSeries(latencyValues, latencyFiftyValues);
+
+    const netRxBwValues = getValues(netRxBw);
+    const netTxBwValues = getValues(netTxBw);
+    const netRxTxSeries = getNetSeries(netRxBwValues, netTxBwValues);
+
+    const alerts = addAlerts(getValues(eqps), qpsValues, latencyValues, alertQuantity);
     const tableStyle = {
-      border: '2px solid black',
+      border: '1px solid black',
       borderCollapse: 'separate'
     };
 
@@ -307,20 +339,18 @@ class NodesResources extends React.Component {
       getValues(qps),
       getValues(latency),
       alertQuantity);
-    console.log('alertColor');
-    console.log(alertColor);
     const headerStyle = {
       background: alertColor,
-      border: '2px solid black'
+      border: '1px solid black'
     };
     const tdStyle = {
-      border: '2px solid black',
+      border: '1px solid black',
       colSpan: '14px',
       width: '200px',
       padding: '25px'
     };
     const thStyle = {
-      border: '10px solid black',
+      border: '1px solid black',
       width: '200px',
       backgroundColor: 'green',
       colSpan: '14px',
@@ -343,11 +373,11 @@ class NodesResources extends React.Component {
                 thStyle={thStyle}
                 tableStyle={tableStyle} data={alerts}>
                 <TableHeaderColumn dataField="id" width="50px" isKey>ID</TableHeaderColumn>
-                <TableHeaderColumn dataField="alertType" width="100px">Alert Type</TableHeaderColumn>
-                <TableHeaderColumn dataField="qpsReq" width="100px">QPS Req</TableHeaderColumn>
-                <TableHeaderColumn dataField="qpsCur" width="100px">QPS</TableHeaderColumn>
-                <TableHeaderColumn dataField="latencyReq" width="100px">Latency Req</TableHeaderColumn>
-                <TableHeaderColumn dataField="latencyCur" width="100px">Latency</TableHeaderColumn>
+                <TableHeaderColumn dataField="alertTime" width="90px">Time</TableHeaderColumn>
+                <TableHeaderColumn dataField="qpsReq" width="90px">QPS Req</TableHeaderColumn>
+                <TableHeaderColumn dataField="qpsCur" width="90px">QPS</TableHeaderColumn>
+                <TableHeaderColumn dataField="latencyReq" width="120px">Latency Req(ms)</TableHeaderColumn>
+                <TableHeaderColumn dataField="latencyCur" width="120px">Latency(ms)</TableHeaderColumn>
               </BootstrapTable>
               <br />
             </div>
