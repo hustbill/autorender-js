@@ -8,7 +8,7 @@ import '../../styles/table-format.css';
 const margin = {top: 5, right: 30, left: 20, bottom: 5};
 const host = 'http://10.145.240.216:8086/query?pretty=true&p=root&u=root&db=workload&rpovh=&';
 // const host = 'http://192.168.0.113:8086/query?pretty=true&p=root&u=root&db=workload&rpovh=&';
-const alertQuantity = Math.floor(Math.random() * 6) + 2;
+// const alertQuantity = Math.floor(Math.random() * 6) + 2;
 
 /*
 * Using the reviver parameter
@@ -218,6 +218,7 @@ class NodesResources extends React.Component {
     super(props, context);
     this.state = {
       seconds: 0,
+      alertQuantity: Math.floor(Math.random() * 6) + 2,
       eqps: [],
       cpuUsage: [],
       cpuCores: [],
@@ -242,7 +243,8 @@ class NodesResources extends React.Component {
 
   tick() {
     this.setState({
-      seconds: this.state.seconds + 5000
+      seconds: this.state.seconds + 5000,
+      alertQuantity: Math.floor(Math.random() * 6) + 2
     });
     const q = 'q=SELECT appname, value from cpu_usage order by time desc limit 12';
     const cmd = host.concat(q);
@@ -309,7 +311,16 @@ class NodesResources extends React.Component {
   }
 
   render() {
-    const {eqps, cpuUsage, cpuCores, qps, latency, latencyFifty, netRxBw, netTxBw} = this.state;
+    const {
+      eqps,
+      cpuUsage,
+      cpuCores,
+      qps,
+      latency,
+      latencyFifty,
+      netRxBw,
+      netTxBw,
+      alertQuantity} = this.state;
     const cpuUsageValues = getValues(cpuUsage);
     const cpuUsageSeries = getCPUSeries(cpuUsageValues);
 
@@ -372,12 +383,12 @@ class NodesResources extends React.Component {
                 tdStyle={tdStyle}
                 thStyle={thStyle}
                 tableStyle={tableStyle} data={alerts}>
-                <TableHeaderColumn dataField="id" width="50px" isKey>ID</TableHeaderColumn>
-                <TableHeaderColumn dataField="alertTime" width="90px">Time</TableHeaderColumn>
-                <TableHeaderColumn dataField="qpsReq" width="90px">QPS Req</TableHeaderColumn>
-                <TableHeaderColumn dataField="qpsCur" width="90px">QPS</TableHeaderColumn>
-                <TableHeaderColumn dataField="latencyReq" width="120px">Latency Req(ms)</TableHeaderColumn>
-                <TableHeaderColumn dataField="latencyCur" width="120px">Latency(ms)</TableHeaderColumn>
+                <TableHeaderColumn dataField="id" width="60px" isKey>ID</TableHeaderColumn>
+                <TableHeaderColumn dataField="alertTime" width="100px">Time</TableHeaderColumn>
+                <TableHeaderColumn dataField="qpsReq" width="100px">QPS Req</TableHeaderColumn>
+                <TableHeaderColumn dataField="qpsCur" width="100px">QPS</TableHeaderColumn>
+                <TableHeaderColumn dataField="latencyReq" width="130px">Latency Req(ms)</TableHeaderColumn>
+                <TableHeaderColumn dataField="latencyCur" width="130px">Latency(ms)</TableHeaderColumn>
               </BootstrapTable>
               <br />
             </div>
