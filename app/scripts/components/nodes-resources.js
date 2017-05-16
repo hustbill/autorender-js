@@ -6,6 +6,7 @@ import '../../styles/report.css';
 import '../../styles/table-format.css';
 
 const margin = {top: 5, right: 30, left: 20, bottom: 5};
+const latencyReq = 195;
 const host = 'http://10.145.240.216:8086/query?pretty=true&p=root&u=root&db=workload&rpovh=&';
 // const host = 'http://192.168.0.113:8086/query?pretty=true&p=root&u=root&db=workload&rpovh=&';
 // const alertQuantity = Math.floor(Math.random() * 6) + 2;
@@ -124,8 +125,8 @@ function getTwoSeries(latencyValues, latencyFiftyValues) {
       hhmmss = latencyValues[0][i][0].substring('2017-05-05T'.length, '2017-05-05T'.length + '01:51:03'.length);
       row = {
         name: hhmmss,
-        'latency_99%(ms)': latencyValues[0][i][2] * 1000,
-        'latency_50%(ms)': latencyFiftyValues[0][i][2] * 1000
+        'Latency_99%(ms)': latencyValues[0][i][2] * 1000,
+        'Latency_50%(ms)': latencyFiftyValues[0][i][2] * 1000
       };
       rows.push(row);
     }
@@ -134,8 +135,6 @@ function getTwoSeries(latencyValues, latencyFiftyValues) {
 }
 
 function getAlertArray(values) {
-  console.log('values');
-  console.log(values);
   const rows = [];
   if (values !== null && values.length !== 0) {
     let row = {};
@@ -149,8 +148,6 @@ function getAlertArray(values) {
 }
 
 function getAlertTimeArray(values) {
-  console.log('values');
-  console.log(values);
   const rows = [];
   if (values !== null && values.length !== 0) {
     let row = {};
@@ -174,7 +171,7 @@ function addAlerts(eqps, qps, latency, quantity) {
   const latencyArr = getAlertArray(latency);
   const startId = alerts.length;
 
-  for (let i = 1; i < quantity; i += 1) {
+  for (let i = 1; i <= quantity; i += 1) {
     const id = startId + i;
     if (timeArr !== null && timeArr.length !== 0) {
       timeStr = timeArr[i].substring('2017-05-05T'.length, '2017-05-05T'.length + '01:51:03'.length);
@@ -184,7 +181,7 @@ function addAlerts(eqps, qps, latency, quantity) {
       alertTime: timeStr,
       qpsReq: eqpsArr[i],
       qpsCur: qpsArr[i],
-      latencyReq: 195,
+      latencyReq,
       latencyCur: (latencyArr[i] * 1000).toFixed(1)
     });
   }
@@ -197,15 +194,12 @@ function getAlertColor(eqps, qps, latency, quantity) {
   const eqpsArr = getAlertArray(eqps);
   const qpsArr = getAlertArray(qps);
   const latencyArr = getAlertArray(latency);
-
-  for (let i = 1; i < quantity; i += 1) {
-    // const type = (Math.floor((Math.random() * 50) + 1) % 2) === 0 ? 'Latency' : 'QPS';
-    const latencyCur = (latencyArr[i] * 1000).toFixed(1);
-    if (qpsArr[i] < eqpsArr[i] || latencyCur > 210) {
-      alertColor = 'red';
-    } else {
-      alertColor = '#00ff00';
-    }
+  const i = quantity;
+  const latencyCur = (latencyArr[i] * 1000).toFixed(1);
+  if (qpsArr[i] < eqpsArr[i] || latencyCur > latencyReq) {
+    alertColor = 'red';
+  } else {
+    alertColor = '#00ff00'; /* green */
   }
   return alertColor;
 }
@@ -410,8 +404,8 @@ class NodesResources extends React.Component {
           <CartesianGrid strokeDasharray="3 3" />
           <Tooltip />
           <Legend />
-          <Line type="monotone" dataKey="latency_99%(ms)" stroke="blueviolet" activeDot={{r: 8}} />
-          <Line type="monotone" dataKey="latency_50%(ms)" stroke="crimson" />
+          <Line type="monotone" dataKey="Latency_99%(ms)" stroke="blueviolet" activeDot={{r: 8}} />
+          <Line type="monotone" dataKey="Latency_50%(ms)" stroke="crimson" />
         </LineChart>
         <br />
         <LineChart width={960} height={300} data={netRxTxSeries} margin={margin}>
