@@ -74,7 +74,7 @@ if (process.env.NODE_ENV !== 'production') {
  *
  *****************/
 
-var port = process.env.PORT || 4043;
+var port = process.env.PORT || 4041;
 var server = app.listen(port, function () {
   var host = server.address().address;
   var port = server.address().port;

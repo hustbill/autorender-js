@@ -45,4 +45,4 @@ debug('Store log message');
 Got a blank screen when loading `http://localhost:4042`?
 
 Make sure you are accessing the right machine:
-If you're running `npm start` on a virtual machine with IP 10.145.240.148, you need to point your browser to `http://10.145.240.148:4042`.  
+If you're running `npm start` on a virtual machine with IP 10.145.240.216, you need to point your browser to `http://10.145.240.148:4042`.  

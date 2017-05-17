@@ -226,8 +226,6 @@ class NodesResources extends React.Component {
   }
 
   componentDidMount() {
-    // cpu_usage
-
     this.interval = setInterval(this.tick.bind(this), 5000);
   }
 
@@ -238,8 +236,10 @@ class NodesResources extends React.Component {
   tick() {
     this.setState({
       seconds: this.state.seconds + 5000,
-      alertQuantity: Math.floor(Math.random() * 6) + 2
+      alertQuantity: Math.floor(Math.random() * 6) + 2  // quantity of alerts
     });
+
+    // cpu_usage
     const q = 'q=SELECT appname, value from cpu_usage order by time desc limit 12';
     const cmd = host.concat(q);
     fetch(cmd)
@@ -303,7 +303,7 @@ class NodesResources extends React.Component {
     ev.stopPropagation();
     this.props.enterEdge(ev.currentTarget.id);
   }
-
+  
   render() {
     const {
       eqps,
