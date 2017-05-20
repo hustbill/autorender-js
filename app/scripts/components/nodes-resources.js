@@ -2,10 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import {BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend} from 'recharts';
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
-import 'react-table/react-table.css';
-
-import '../../styles/report.css';
-import '../../styles/table-format.css';
+// import '../../styles/report.css';
 
 const margin = {top: 5, right: 30, left: 20, bottom: 5};
 const host = 'http://10.145.240.216:8086/query?pretty=true&p=root&u=root&db=workload&rpovh=&';
