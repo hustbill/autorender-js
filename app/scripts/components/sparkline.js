@@ -1,6 +1,5 @@
 // Forked from: https://github.com/KyleAMathews/react-sparkline at commit a9d7c5203d8f240938b9f2288287aaf0478df013
 import React from 'react';
-import PropTypes from 'prop-types';
 import { min as d3Min, max as d3Max, mean as d3Mean } from 'd3-array';
 import { isoParse as parseDate } from 'd3-time-format';
 import { line, curveLinear } from 'd3-shape';
@@ -10,9 +9,9 @@ import { formatMetricSvg } from '../utils/string-utils';
 
 
 export default class Sparkline extends React.Component {
+
   constructor(props, context) {
     super(props, context);
-
     this.x = scaleLinear();
     this.y = scaleLinear();
     this.line = line()
@@ -97,7 +96,7 @@ export default class Sparkline extends React.Component {
 }
 
 Sparkline.propTypes = {
-  data: PropTypes.arrayOf(PropTypes.object)
+  data: React.PropTypes.arrayOf(React.PropTypes.object)
 };
 
 Sparkline.defaultProps = {
@@ -106,6 +105,5 @@ Sparkline.defaultProps = {
   strokeColor: '#7d7da8',
   strokeWidth: '0.5px',
   curve: curveLinear,
-  circleDiameter: 1.75,
-  data: [],
+  circleDiameter: 1.75
 };

@@ -7,7 +7,7 @@ import '../../styles/table-format.css';
 
 const margin = {top: 5, right: 30, left: 20, bottom: 5};
 const latencyReq = 195;
-const host = 'http://10.145.240.216:8086/query?pretty=true&p=root&u=root&db=workload&rpovh=&';
+const host = 'http://localhost:8086/query?pretty=true&p=root&u=root&db=workload&rpovh=&';
 // const host = 'http://192.168.0.113:8086/query?pretty=true&p=root&u=root&db=workload&rpovh=&';
 // const alertQuantity = Math.floor(Math.random() * 6) + 2;
 
@@ -226,6 +226,8 @@ class NodesResources extends React.Component {
   }
 
   componentDidMount() {
+    // cpu_usage
+
     this.interval = setInterval(this.tick.bind(this), 5000);
   }
 
@@ -236,10 +238,8 @@ class NodesResources extends React.Component {
   tick() {
     this.setState({
       seconds: this.state.seconds + 5000,
-      alertQuantity: Math.floor(Math.random() * 6) + 2  // quantity of alerts
+      alertQuantity: Math.floor(Math.random() * 6) + 2
     });
-
-    // cpu_usage
     const q = 'q=SELECT appname, value from cpu_usage order by time desc limit 12';
     const cmd = host.concat(q);
     fetch(cmd)
@@ -303,7 +303,7 @@ class NodesResources extends React.Component {
     ev.stopPropagation();
     this.props.enterEdge(ev.currentTarget.id);
   }
-  
+
   render() {
     const {
       eqps,

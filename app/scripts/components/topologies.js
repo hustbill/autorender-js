@@ -2,7 +2,6 @@ import React from 'react';
 import { connect } from 'react-redux';
 import classnames from 'classnames';
 
-import { trackMixpanelEvent } from '../utils/tracking-utils';
 import { searchMatchCountByTopologySelector } from '../selectors/search';
 import { isResourceViewModeSelector } from '../selectors/topology';
 import { clickTopology } from '../actions/app-actions';
@@ -26,12 +25,8 @@ class Topologies extends React.Component {
     this.onTopologyClick = this.onTopologyClick.bind(this);
   }
 
-  onTopologyClick(ev, topology) {
+  onTopologyClick(ev) {
     ev.preventDefault();
-    trackMixpanelEvent('scope.topology.selector.click', {
-      topologyId: topology.get('id'),
-      parentTopologyId: topology.get('parentId'),
-    });
     this.props.clickTopology(ev.currentTarget.getAttribute('rel'));
   }
 
@@ -49,7 +44,7 @@ class Topologies extends React.Component {
     return (
       <div
         className={className} title={title} key={topologyId} rel={topologyId}
-        onClick={ev => this.onTopologyClick(ev, subTopology)}>
+        onClick={this.onTopologyClick}>
         <div className="topologies-sub-item-label">
           {subTopology.get('name')}
         </div>
@@ -70,9 +65,7 @@ class Topologies extends React.Component {
 
     return (
       <div className="topologies-item" key={topologyId}>
-        <div
-          className={className} title={title} rel={topologyId}
-          onClick={ev => this.onTopologyClick(ev, topology)}>
+        <div className={className} title={title} rel={topologyId} onClick={this.onTopologyClick}>
           <div className="topologies-item-label">
             {topology.get('name')}
           </div>
