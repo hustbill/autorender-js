@@ -8,10 +8,10 @@ items:
       annotations:
         cloud.weave.works/launcher-info: |-
           {
-            "server-version": "master-9eec4bc",
+            "server-version": "master-99ec20a",
             "original-request": {
-              "url": "/k8s/v1.5/scope.yaml?/launch/k8s/weavescope.yaml",
-              "date": "Mon Apr 17 2017 23:51:18 GMT+0000 (UTC)"
+              "url": "/k8s/v1.6/scope.yaml?k8s-version=1.6",
+              "date": "Wed May 24 2017 21:39:18 GMT+0000 (UTC)"
             },
             "email-address": "support@weave.works"
           }
@@ -27,10 +27,10 @@ items:
       annotations:
         cloud.weave.works/launcher-info: |-
           {
-            "server-version": "master-9eec4bc",
+            "server-version": "master-99ec20a",
             "original-request": {
-              "url": "/k8s/v1.5/scope.yaml?/launch/k8s/weavescope.yaml",
-              "date": "Mon Apr 17 2017 23:51:18 GMT+0000 (UTC)"
+              "url": "/k8s/v1.6/scope.yaml?k8s-version=1.6",
+              "date": "Wed May 24 2017 21:39:18 GMT+0000 (UTC)"
             },
             "email-address": "support@weave.works"
           }
@@ -45,7 +45,7 @@ items:
         spec:
           containers:
             - name: app
-              image: 'weaveworks/scope:1.3.0'
+              image: 'weaveworks/scope:1.4.0'
               imagePullPolicy: IfNotPresent
               args:
                 - '--no-probe'
@@ -53,7 +53,7 @@ items:
                 - containerPort: 4040
                   protocol: TCP
       replicas: 1
-    apiVersion: extensions/v1beta1
+    apiVersion: apps/v1beta1
     kind: Deployment
   - metadata:
       labels:
@@ -65,10 +65,10 @@ items:
       annotations:
         cloud.weave.works/launcher-info: |-
           {
-            "server-version": "master-9eec4bc",
+            "server-version": "master-99ec20a",
             "original-request": {
-              "url": "/k8s/v1.5/scope.yaml?/launch/k8s/weavescope.yaml",
-              "date": "Mon Apr 17 2017 23:51:18 GMT+0000 (UTC)"
+              "url": "/k8s/v1.6/scope.yaml?k8s-version=1.6",
+              "date": "Wed May 24 2017 21:39:18 GMT+0000 (UTC)"
             },
             "email-address": "support@weave.works"
           }
@@ -95,10 +95,10 @@ items:
       annotations:
         cloud.weave.works/launcher-info: |-
           {
-            "server-version": "master-9eec4bc",
+            "server-version": "master-99ec20a",
             "original-request": {
-              "url": "/k8s/v1.5/scope.yaml?/launch/k8s/weavescope.yaml",
-              "date": "Mon Apr 17 2017 23:51:18 GMT+0000 (UTC)"
+              "url": "/k8s/v1.6/scope.yaml?k8s-version=1.6",
+              "date": "Wed May 24 2017 21:39:18 GMT+0000 (UTC)"
             },
             "email-address": "support@weave.works"
           }
@@ -110,13 +110,13 @@ items:
             app: weave-scope
             weave-cloud-component: scope
             weave-scope-component: agent
-          annotations:
-            scheduler.alpha.kubernetes.io/tolerations: >-
-              [{"key":"dedicated","operator":"Equal","value":"master","effect":"NoSchedule"}]
         spec:
+          tolerations:
+            - key: node-role.kubernetes.io/master
+              effect: NoSchedule
           containers:
             - name: agent
-              image: 'weaveworks/scope:1.3.0'
+              image: 'weaveworks/scope:1.4.0'
               imagePullPolicy: IfNotPresent
               args:
                 - '--no-app'
@@ -144,3 +144,54 @@ items:
           serviceAccountName: weave-scope
     apiVersion: extensions/v1beta1
     kind: DaemonSet
+  - metadata:
+      labels:
+        name: weave-scope
+      name: weave-scope
+      annotations:
+        cloud.weave.works/launcher-info: |-
+          {
+            "server-version": "master-99ec20a",
+            "original-request": {
+              "url": "/k8s/v1.6/scope.yaml?k8s-version=1.6",
+              "date": "Wed May 24 2017 21:39:18 GMT+0000 (UTC)"
+            },
+            "email-address": "support@weave.works"
+          }
+    rules:
+      - apiGroups:
+          - '*'
+        resources:
+          - '*'
+        verbs:
+          - '*'
+      - nonResourceURLs:
+          - '*'
+        verbs:
+          - '*'
+    apiVersion: rbac.authorization.k8s.io/v1beta1
+    kind: ClusterRole
+  - metadata:
+      labels:
+        name: weave-scope
+      name: weave-scope
+      annotations:
+        cloud.weave.works/launcher-info: |-
+          {
+            "server-version": "master-99ec20a",
+            "original-request": {
+              "url": "/k8s/v1.6/scope.yaml?k8s-version=1.6",
+              "date": "Wed May 24 2017 21:39:18 GMT+0000 (UTC)"
+            },
+            "email-address": "support@weave.works"
+          }
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: ClusterRole
+      name: weave-scope
+    subjects:
+      - kind: ServiceAccount
+        name: weave-scope
+        namespace: kube-system
+    apiVersion: rbac.authorization.k8s.io/v1beta1
+    kind: ClusterRoleBinding
