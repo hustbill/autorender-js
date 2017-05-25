@@ -2,21 +2,21 @@ apiVersion: extensions/v1beta1
 kind: DaemonSet
 metadata:
   labels:
-    app: autorender
-    weavescope-component: network-control-plugin
-  name: network-control-plugin
+    app: envi-app
+    weavescope-component: envi-network-plugin
+  name: envi-network-plugin
 spec:
   template:
     metadata:
       labels:
-        app: autorender
-        weavescope-component: network-control-plugin
+        app: envi-app
+        weavescope-component: envi-network-plugin
     spec:
       hostPID: true
       hostNetwork: true
       containers:
-        - name: network-control-plugin
-          image: billyzhang2010/network-control-plugin:latest
+        - name: envi-network-plugin
+          image: billyzhang2010/scope-network-control:latest
           securityContext:
             privileged: true
           volumeMounts:

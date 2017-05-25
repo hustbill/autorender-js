@@ -30,7 +30,7 @@ spec:
       restartPolicy: Always
       containers:
       - name: autorender-ui
-        image: billyzhang2010/autorender-ui:v1.4
+        image: billyzhang2010/autorender-ui:latest
         ports:
         - containerPort: 80
         - containerPort: 4042
