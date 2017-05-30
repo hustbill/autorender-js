@@ -79,7 +79,7 @@ module.exports = {
         loader: 'babel'
       },
       {
-        test: /\.scss$/,
+        test: /\.(scss|css)$/,
         loader: ExtractTextPlugin.extract('style-loader', 'css-loader!postcss!sass-loader?minimize')
       }
     ]
@@ -124,8 +124,8 @@ module.exports = {
       chunks: ['vendors', 'app', 'contrast-theme'],
       template: 'app/html/index.html',
       filename: 'index.html'
-    }),
-    new ContrastStyleCompiler()
+    }) // ,
+    // new ContrastStyleCompiler()
   ],
   sassLoader: {
     includePaths: [

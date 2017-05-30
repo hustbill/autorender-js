@@ -22,7 +22,7 @@ var backendProxy = httpProxy.createProxy({
   ws: true,
   //target: 'http://' + BACKEND_HOST + ':4040'
   // target: 'http://' + "WEAVE_SCOPE_APP_SERVICE_HOST"
-  target: 'http://' + "weave-scope-app.kube-system"  
+  target: 'http://' + "weave-scope-app.kube-system"
   // target: 'http://10.145.240.148:4040'
   // target: 'http://' + BACKEND_HOST  // export BACKEND_HOST=10.105.179.46
 });
@@ -75,7 +75,7 @@ if (process.env.NODE_ENV !== 'production') {
  *
  *****************/
 
-var port = process.env.PORT || 4042;
+var port = process.env.PORT || 4041;
 var server = app.listen(port, function () {
   var host = server.address().address;
   var port = server.address().port;
@@ -100,7 +100,7 @@ var proxyRules = new HttpProxyRules({
 
 var pathProxy = httpProxy.createProxy({ws: true});
 pathProxy.on('error', function(err) { console.error('path proxy error', err); });
-var pathProxyPort = port + 1;
+var pathProxyPort = port + 3;
 const proxyPathServer = http.createServer(function(req, res) {
   var target = proxyRules.match(req);
   if (!target) {
